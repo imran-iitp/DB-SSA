@@ -1,7 +1,6 @@
 from MyHelper import MyHelper
 from gen.PlSqlVisitor import PlSqlVisitor
 
-
 class MySsaStringGenerator(PlSqlVisitor):
 
     def __init__(self, cfg, parser):
