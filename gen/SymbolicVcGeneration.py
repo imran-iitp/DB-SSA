@@ -103,6 +103,7 @@ class SymbolicVcGeneration(PlSqlVisitor):
 
 
     def getCondition(self, nodeId, ctx):
+        
         if ctx.children[0].children[1].getText()== "OR":
             #input("wait")
             res = "Or("+self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0])+" , " +\
@@ -112,6 +113,7 @@ class SymbolicVcGeneration(PlSqlVisitor):
                   self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[2])+")"
         else:
             res =  self.getVersionedTerminalRHS(nodeId, ctx)
+            
         return res
 
     def getAssignment_statement(self, node, ctx):
