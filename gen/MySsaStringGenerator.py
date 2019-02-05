@@ -23,6 +23,7 @@ class MySsaStringGenerator(PlSqlVisitor):
             #todo: destructed phi nodes
         else:
             ruleName = self.helper.getRuleName(ctx)
+            
             if ruleName == "parameter":
                 res = self.getParameter(nodeId, ctx)
             if ruleName == "variable_declaration":
