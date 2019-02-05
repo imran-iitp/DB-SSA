@@ -10,6 +10,7 @@ class MySsaStringGenerator(PlSqlVisitor):
 
 
     def execute(self):
+        
         for nodeId in self.cfg.nodes:
             self.cfg.nodes[nodeId].oldString = self.getTerminal(self.cfg.nodes[nodeId].ctx)
             self.cfg.nodes[nodeId].stringSsa = self.getSsaString(nodeId)
