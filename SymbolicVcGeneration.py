@@ -32,11 +32,12 @@ class SymbolicVcGeneration(PlSqlVisitor):
                 #print(ruleName)
                 #print(str(context.toStringTree(recog=self.parser)))
                 if ruleName == "condition":
+                    tempctx = context.children[0]
                     
                     if self.cfg.nodes[node].branching['true'] == path[i+1]:
-                        vcs = "And(" + vcs + ", " +  self.getCondition(node, context) + ")"
+                        vcs = "And(" + vcs + ", " +  self.getCondition(node, tempctx) + ")"
                     else:
-                        vcs = "And(" + vcs + ", " +  "Not("+self.getCondition(node, context)+")" + ")"
+                        vcs = "And(" + vcs + ", " +  "Not("+self.getCondition(node, tempctx)+")" + ")"
     
                 if ruleName == "assignment_statement":
                     vcs = "And(" + vcs + ", " + self.getAssignment_statement(node, context) + ")"
@@ -103,23 +104,28 @@ class SymbolicVcGeneration(PlSqlVisitor):
 
 
     def getCondition(self, nodeId, ctx):
-        print(self.helper.getRuleName(ctx))
-        #input("wait")
-        if ctx.children[0].getChildCount() == 1:
-            res =  self.getVersionedTerminalRHS(nodeId, ctx)
+        
+        if ctx.children[1].getText() == "AND":
+            # print(self.helper.getRuleName(ctx.children[0]))
+            res = self.getCondition(nodeId, ctx.children[0]) + " && " + \
+                  "(" + self.getCondition(nodeId, ctx.children[2]) + ")"
+            # input("wait")
+
+        elif ctx.children[1].getText() == "IN":
+            res = self.getVersionedTerminalRHS(nodeId, ctx.children[0]) + "==" + \
+                  self.getVersionedTerminalRHS(nodeId, ctx.children[3].children[0].children[1]) + \
+                  "&&" + self.getWhereexpr(nodeId, ctx.children[3].children[0].children[3].children[1])
+        elif ctx.children[1].getText() == "IS":
+            res = "true"
+
         else:
-            
-            if ctx.children[0].children[1].getText()== "OR":
-                res = "Or("+self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0])+" , " +\
-                      self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[2])+")"
-            elif ctx.children[0].children[1].getText()== "AND":
-                res = "And("+self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0])+" , " +\
-                      self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[2])+")"
-            elif ctx.children[0].children[1].getText() == "=":
-                res = self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0]) + "==" + \
-                      self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[2])
+            if ctx.children[1].getText() == "=":
+                res = self.getVersionedTerminalRHS(nodeId, ctx.children[0]) + "==" + \
+                      self.getVersionedTerminalRHS(nodeId, ctx.children[2])
             else:
-                res =  self.getVersionedTerminalRHS(nodeId, ctx)
+                res = self.getVersionedTerminalRHS(nodeId, ctx.children[0]) + self.getTerminal(ctx.children[1]) + \
+                      self.getVersionedTerminalRHS(nodeId, ctx.children[2])
+
         return res
 
     def getAssignment_statement(self, node, ctx):
