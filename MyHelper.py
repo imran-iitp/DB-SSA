@@ -123,9 +123,17 @@ class MyHelper(PlSqlVisitor):
             funName = ctx.children[0].getText()
             res = res.union(self.functionDict[funName][1])
         elif ruleName == "assume_statement":
-            res.add(ctx.children[1].children[0].getText())
+            self.temp = set()
+            self.visit(ctx.children[1])
+            res = res.union(self.temp)
+            self.temp = set()
+            #res.add(ctx.children[1].children[0].getText())
         elif ruleName == "assert_statement":
-            res.add(ctx.children[1].children[0].getText())
+            self.temp = set()
+            self.visit(ctx.children[1])
+            res = res.union(self.temp)
+            self.temp = set()
+            #res.add(ctx.children[1].children[0].getText())
         return res
 
 
@@ -137,11 +145,7 @@ class MyHelper(PlSqlVisitor):
         else:
             res = set()
             ruleName = self.getRuleName(ctx)
-            # if ruleName=="parameter":
-            #     res.add(ctx.children[0].getText())
-            # elif ruleName=="variable_declaration":
-            #     res.add(ctx.children[0].getText())
-            # el
+           
             if ruleName=="cursor_declaration":
                 res.add(ctx.children[1].getText())
             elif ruleName=="fetch_statement":
@@ -163,6 +167,13 @@ class MyHelper(PlSqlVisitor):
             elif ruleName == "function_call":
                 funName = ctx.children[0].getText()
                 res = res.union(self.functionDict[funName][0])
+            elif ruleName == "select_statement":
+                #print("\n\n\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4 entered in LHS select\n\n\n")
+                tempCtx = ctx.children[0].children[0]
+                for i in range(tempCtx.getChildCount()):
+                    #print("\n\t\t\t", self.getRuleName(tempCtx.children[i]), "\n\n")
+                    if self.getRuleName(tempCtx.children[i]) == "into_clause":
+                        res.add(tempCtx.children[i].children[1].getText())
             return res
 
 
