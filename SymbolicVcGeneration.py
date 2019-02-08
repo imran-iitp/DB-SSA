@@ -66,20 +66,33 @@ class SymbolicVcGeneration(PlSqlVisitor):
         return res
     
     def getAssert_statement(self, nodeId, ctx):
-        res =  self.getWhereexpr(nodeId, ctx.children[1]) 
+        res =  self.assertExpression(nodeId, ctx.children[1]) 
+        return res
+
+    def assertExpression(self, nodeId, ctx):
+        if  ctx.children[1].getText() == "AND":
+            #print(self.helper.getRuleName(ctx.children[0]))
+            res =  "Or(" + self.assertExpression(nodeId, ctx.children[0])+ ", " + \
+                   self.assertExpression(nodeId, ctx.children[2])+ ")"
+        else:
+            if ctx.children[1].getText() == "=":
+                #input("wait")
+                res = self.getVersionedTerminalRHS(nodeId, ctx.children[0]) + "==" + \
+                      self.getVersionedTerminalRHS(nodeId, ctx.children[2])
+            else:
+                res = self.getVersionedTerminalRHS(nodeId, ctx.children[0]) + self.getTerminal(ctx.children[1]) + \
+                      self.getVersionedTerminalRHS(nodeId, ctx.children[2])
         return res
 
     def getSelect_statement(self, nodeId, ctx):
         global vcs
-        #print(ctx.children[0].children[0].getChildCount())
-        #print(self.helper.getRuleName(ctx.children[0]))
-        #input("Hi")
+       
         vcs = "And(" + vcs + ", " + self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0].children[1]) + "==" + \
               self.getInto_clause(nodeId, ctx.children[0].children[0].children[2]) + ")"
         vcs = "And(" + vcs + ", " + self.getWhereClause(nodeId, ctx.children[0].children[0].children[4]) +")"
                
         return vcs
-        #input("Wait")
+       
 
     def getInto_clause(self, nodeId, ctx):
         return self.getVersionedTerminalRHS(nodeId, ctx.children[1])
@@ -180,18 +193,7 @@ class SymbolicVcGeneration(PlSqlVisitor):
         return res
 
     def getWhereexpr(self, nodeId, ctx):
-        #global vcs
-        #opr = ctx.children[1].getText()
-        #oper = self.getTerminal(ctx.children[1])
-        #print(self.helper.getRuleName(ctx.children[1]))
-        #print(ctx.children[1].getText())
-        #temp = 'AND'
-        #print(opr == temp)
-        #input("hi")
-        #print(type("AND"))
-        #print(self.helper.getRuleName(ctx.children[1]))
-        #print(self.getTerminal(ctx.children[1]))
-        #input("Wait") ctx.children[1].getText()
+       
         if  ctx.children[1].getText() == "AND":
             #print(self.helper.getRuleName(ctx.children[0]))
             res =  "And(" + self.getWhereexpr(nodeId, ctx.children[0])+ ", " + \
@@ -202,14 +204,10 @@ class SymbolicVcGeneration(PlSqlVisitor):
             res = "And(" +  self.getVersionedTerminalRHS(nodeId, ctx.children[0]) + "==" +\
                   self.getVersionedTerminalRHS(nodeId, ctx.children[3].children[0].children[1]) +\
                   "," + self.getWhereexpr(nodeId, ctx.children[3].children[0].children[3].children[1])+")"
-            #print(res)
-            #input("Wait")
-            #input("HI")
+           
         
         else:
-            #print(self.helper.getRuleName(ctx.children[1]))
-            #print(self.getTerminal(ctx.children[1]))
-            #print(ctx.children[1].getText())
+            
             if ctx.children[1].getText() == "=":
                 #input("wait")
                 res = self.getVersionedTerminalRHS(nodeId, ctx.children[0]) + "==" + \
@@ -218,13 +216,7 @@ class SymbolicVcGeneration(PlSqlVisitor):
                 res = self.getVersionedTerminalRHS(nodeId, ctx.children[0]) + self.getTerminal(ctx.children[1]) + \
                       self.getVersionedTerminalRHS(nodeId, ctx.children[2])
         return res
-        #c = ctx.getChildCount()
-        #print(self.helper.getRuleName(ctx.children[1]))
-        #print(self.getTerminal(ctx.children[1]))
-        #input("Enter the value")
-        #res = ""
-        #res = res + self.getVersionedTerminalRHS(nodeId, ctx)
-        #return res
+       
         '''
         for i in range(c):
             if ctx.children[i].getChildCount() > 1:
@@ -235,13 +227,7 @@ class SymbolicVcGeneration(PlSqlVisitor):
         else:
             res = self.getVersionedTerminalRHS(nodeId, ctx)
         '''
-        #print(self.helper.getRuleName(ctx.children[0].children[0]))
-        #print(ctx.children[0].children[2].getChildCount())
-        #input('enter the vlue')
-        #if self.helper.getRuleName(ctx) == "RelExpr":
-        #return res
-        #res = self.getVersionedTerminalRHS(nodeId, ctx.children[0]) +' == '+ \
-              #self.getVersionedTerminalRHS(nodeId, ctx.children[2])
+        
         
 
     def getInsert_statement(self, nodeId, ctx):
@@ -271,11 +257,7 @@ class SymbolicVcGeneration(PlSqlVisitor):
             vcs = "And(" + vcs + ", " + colmnlistinto[element] +" == "+colmnlistvalues[element] +")"
         return vcs
 
-        #c= str(c1) + " " + str(c2)
-        #return colmnlistvalues
-        #return self.helper.getRuleName(ctx)
-    #def getInsertValueClause(self, nodeId, ctx):
-      #  pass
+    
 
     def getVersionedTerminalRHS(self, nodeId, ctx):
         c = ctx.getChildCount()
