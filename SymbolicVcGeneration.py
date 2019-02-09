@@ -34,10 +34,17 @@ class SymbolicVcGeneration(PlSqlVisitor):
                 if ruleName == "condition":
                     tempctx = context.children[0]
                     
-                    if self.cfg.nodes[node].branching['true'] == path[i+1]:
-                        vcs = "And(" + vcs + ", " +  self.getCondition(node, tempctx) + ")"
+                    if self.cfg.nodes[node].branching['true'] == path[i + 1]:
+                        if childctx.children[2].getText() == "NULL":
+                            vcs = "And(" + vcs + ", " +"True" + ")"
+                        else:
+                            vcs = "And(" + vcs + ", " + self.getCondition(node, childctx) + ")"
+
                     else:
-                        vcs = "And(" + vcs + ", " +  "Not("+self.getCondition(node, tempctx)+")" + ")"
+                        if childctx.children[2].getText() == "NULL":
+                            vcs = "And(" + vcs + ", "+ "True" + ")"
+                        else:
+                            vcs = "And(" + vcs + ", " + "Not("+self.getCondition(node, childctx) + "))"
     
                 if ruleName == "assignment_statement":
                     vcs = "And(" + vcs + ", " + self.getAssignment_statement(node, context) + ")"
