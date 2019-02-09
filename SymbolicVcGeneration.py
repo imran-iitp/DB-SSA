@@ -37,12 +37,16 @@ class SymbolicVcGeneration(PlSqlVisitor):
                     if self.cfg.nodes[node].branching['true'] == path[i + 1]:
                         if childctx.children[2].getText() == "NULL":
                             vcs = "And(" + vcs + ", " +"True" + ")"
+                        elif childctx.children[2].getText() == "NOTNULL":
+                            vcs = "And(" + vcs + ", " + "True" + ")"
                         else:
                             vcs = "And(" + vcs + ", " + self.getCondition(node, childctx) + ")"
 
                     else:
                         if childctx.children[2].getText() == "NULL":
                             vcs = "And(" + vcs + ", "+ "True" + ")"
+                        elif childctx.children[2].getText() == "NOTNULL":
+                            vcs = "And(" + vcs + ", " + "True" + ")"
                         else:
                             vcs = "And(" + vcs + ", " + "Not("+self.getCondition(node, childctx) + "))"
     
@@ -58,6 +62,8 @@ class SymbolicVcGeneration(PlSqlVisitor):
                     vcs = "And(" + vcs + ", " + self.getFetch_statement(node, context)+ ")"
                 if ruleName == "select_statement":
                     vcs = self.getSelect_statement(node, context)
+                if ruleName == "delete_statement":
+                    vcs = "And("+vcs+" , "+self.getDelete_statement(node, context)+")"
                 if ruleName == "assume_statement":
                     vcs = "And(" + vcs + ", "+ self.getAssume_statement(node, context) +")"
                 if ruleName == "assert_statement":
@@ -194,7 +200,12 @@ class SymbolicVcGeneration(PlSqlVisitor):
         res = self.getVersionedTerminalLHS(nodeId, ctx.children[0]) +' == '+ \
               self.getVersionedTerminalRHS(nodeId, ctx.children[0])
         return res
-
+    
+    def getDelete_statement(self, nodeId, ctx):
+        c = ctx.getChildCount()
+        res = self.getWhereClause(nodeId, ctx.children[c-1])
+        return res
+    
     def getWhereClause(self, nodeId, ctx):
         res = self.getWhereexpr(nodeId, ctx.children[1])
         return res
