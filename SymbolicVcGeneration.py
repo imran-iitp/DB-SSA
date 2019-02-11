@@ -103,6 +103,11 @@ class SymbolicVcGeneration(PlSqlVisitor):
         vcs = "And(" + vcs + ", " + self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0].children[1]) + "==" + \
               self.getInto_clause(nodeId, ctx.children[0].children[0].children[2]) + ")"
         vcs = "And(" + vcs + ", " + self.getWhereClause(nodeId, ctx.children[0].children[0].children[4]) +")"
+        
+        if self.cfg.nodes[nodeId].destructedPhi:
+            for element in self.cfg.nodes[nodeId].destructedPhi:
+                values = self.cfg.nodes[nodeId].destructedPhi[element]
+                vcs = "And(" + vcs + ", " + values[0] + "==" + values[1] + ")"
                
         return vcs
        
@@ -204,6 +209,10 @@ class SymbolicVcGeneration(PlSqlVisitor):
     def getDelete_statement(self, nodeId, ctx):
         c = ctx.getChildCount()
         res = self.getWhereClause(nodeId, ctx.children[c-1])
+        if self.cfg.nodes[nodeId].destructedPhi:
+            for element in self.cfg.nodes[nodeId].destructedPhi:
+                values = self.cfg.nodes[nodeId].destructedPhi[element]
+                res = "And(" + res + ", " + values[0] + "==" + values[1] + ")"
         return res
     
     def getWhereClause(self, nodeId, ctx):
@@ -251,6 +260,10 @@ class SymbolicVcGeneration(PlSqlVisitor):
     def getInsert_statement(self, nodeId, ctx):
         global vcs
         vcs = str(self.getInsertIntoandValueClause(nodeId, ctx.children[1]))
+        if self.cfg.nodes[nodeId].destructedPhi:
+            for element in self.cfg.nodes[nodeId].destructedPhi:
+                values = self.cfg.nodes[nodeId].destructedPhi[element]
+                res = "And(" + res + ", " + values[0] + "==" + values[1] + ")"
         return vcs 
 
     def getInsertIntoandValueClause(self, nodeId, ctx):
