@@ -69,8 +69,7 @@ def main(argv):
     ssaString = MySsaStringGenerator(cfg, parser)
     ssaString.execute()
     
-    #vcs = SymbolicVeGeneration(cfg, parser)
-    #vcs.SymbolicVcCalculation()
+    
     
     
     utility.dfs(cfg.nodes[0].id, cfg)
