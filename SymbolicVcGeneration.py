@@ -231,8 +231,12 @@ class SymbolicVcGeneration(PlSqlVisitor):
             res = "And(" +  self.getVersionedTerminalRHS(nodeId, ctx.children[0]) + "==" +\
                   self.getVersionedTerminalRHS(nodeId, ctx.children[3].children[0].children[1]) +\
                   "," + self.getWhereexpr(nodeId, ctx.children[3].children[0].children[3].children[1])+")"
-           
-        
+        elif ctx.children[1].getText() == "BETWEEN":
+            res = "And("+ self.getVersionedTerminalRHS(nodeId, ctx.children[0])+">=" +self.getVersionedTerminalRHS(nodeId, ctx.children[2])+\
+                  " , "+self.getVersionedTerminalRHS(nodeId, ctx.children[0])+"<=" +self.getVersionedTerminalRHS(nodeId, ctx.children[2])+")"
+        elif ctx.children[1].getText() == "LIKE": #LIKE is similar to  assignment if operand does not have wildcard.
+            res = self.getVersionedTerminalRHS(nodeId, ctx.children[0]) + "==" + \
+                      self.getVersionedTerminalRHS(nodeId, ctx.children[2])
         else:
             
             if ctx.children[1].getText() == "=":
