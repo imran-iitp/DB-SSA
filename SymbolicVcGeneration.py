@@ -209,10 +209,8 @@ class SymbolicVcGeneration(PlSqlVisitor):
     def getDelete_statement(self, nodeId, ctx):
         c = ctx.getChildCount()
         res = self.getWhereClause(nodeId, ctx.children[c-1])
-        if self.cfg.nodes[nodeId].destructedPhi:
-            for element in self.cfg.nodes[nodeId].destructedPhi:
-                values = self.cfg.nodes[nodeId].destructedPhi[element]
-                res = "And(" + res + ", " + values[0] + "==" + values[1] + ")"
+        for key in self.cfg.nodes[node].versionedLHS:
+            res = "And("+ res +","+self.cfg.nodes[node].versionedLHS[key]+"=="+ self.cfg.nodes[node].versionedRHS[key]+")" 
         return res
     
     def getWhereClause(self, nodeId, ctx):
