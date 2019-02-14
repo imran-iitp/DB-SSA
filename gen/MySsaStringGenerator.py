@@ -55,6 +55,10 @@ class MySsaStringGenerator(PlSqlVisitor):
                 res = self.getAssume_statement(nodeId, ctx)
             if ruleName == "assert_statement":
                 res = self.getAssert_statement(nodeId, ctx)
+            if ruleName == "raise_statement":
+                res = self.getRaise_statement(ctx)
+            if ruleName == "exception_handler":
+                res = self.getException_handler(ctx)
         return res
 
 
@@ -125,6 +129,16 @@ class MySsaStringGenerator(PlSqlVisitor):
         res = ""
         res = res + self.getVersionedTerminalLHS(nodeId, ctx.children[0]) + str(ctx.children[1]) + " "
         res = res + self.getVersionedTerminalRHS(nodeId, ctx.children[2])
+        return res
+    
+    def getRaise_statement(self, ctx):
+        res = ""
+        res = res + self.getTerminal(ctx)
+        return res
+    
+    def getException_handler(self, ctx):
+        res = ""
+        res = res + self.getTerminal(ctx)
         return res
 
     def getFunction_call(self, nodeId, ctx):
