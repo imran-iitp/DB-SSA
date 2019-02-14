@@ -47,7 +47,7 @@ unit_statement
     | create_procedure_body
     | create_package
 
-//  | create_index //TODO
+
 //  | create_table //TODO
 //  | create_view //TODO
 //  | create_directory //TODO
