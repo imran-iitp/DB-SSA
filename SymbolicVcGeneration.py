@@ -100,8 +100,8 @@ class SymbolicVcGeneration(PlSqlVisitor):
     def getSelect_statement(self, nodeId, ctx):
         global vcs
        
-        vcs = "And(" + vcs + ", " + self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0].children[1]) + "==" + \
-              self.getInto_clause(nodeId, ctx.children[0].children[0].children[2]) + ")"
+        vcs = "And(" + vcs + ", " + self.getInto_clause(nodeId, ctx.children[0].children[0].children[2]) + "==" + \
+              self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0].children[1]) + ")"
         vcs = "And(" + vcs + ", " + self.getWhereClause(nodeId, ctx.children[0].children[0].children[4]) +")"
         
         if self.cfg.nodes[nodeId].destructedPhi:
