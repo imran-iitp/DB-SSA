@@ -59,14 +59,15 @@ class z3formulaofvcs(PlSqlVisitor):
         global varSet
         y = list(map(lambda k: k+" = Int('"+k+"')\n", varSet))
         with open('fun.py', 'w') as outfile:
-            outfile.writelines("from z3 import *\n")
+           outfile.writelines("from z3 import *\n")
             outfile.writelines(y)
             outfile.writelines("s = Solver()\n")
-            outfile.writelines("s.add("+vc[8:len(vc)-10]+")\n")
+            outfile.writelines("s.add("+vc[8:position+8]+")\n")
             outfile.writelines("s.add(Not("+vc+"))\n")
-            outfile.writelines("print(s.check())\n")
-            outfile.writelines("print(s.model())\n")
-            
-
+            outfile.writelines("r = s.check()\n")
+            outfile.writelines("if r == \"unsat\":\n")
+            outfile.writelines("    print(\"proved\")\n")
+            outfile.writelines("else:\n")
+            outfile.writelines("    print(s.model())\n")
     
 
