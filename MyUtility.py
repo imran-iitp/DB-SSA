@@ -232,8 +232,6 @@ class MyUtility():
     #     return self.stringSsa
 
 
-
-
     def generateVersionedDotFile(self, cfg):
         res = "digraph G {\n\n\t"
         flagLastNode = -1
