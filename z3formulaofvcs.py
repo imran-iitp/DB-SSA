@@ -38,6 +38,22 @@ class z3formulaofvcs(PlSqlVisitor):
 
 
         return varSet
+ 
+
+
+    @staticmethod
+    def anticedent_position(x):
+        l = []
+        for index,bracket in enumerate(x):
+            if bracket == '(':
+                l.append(bracket)
+            else:
+                if bracket == ')':
+                    l.pop();
+                    if(len(l)==0):
+                        return index+1
+                    
+                    
     
     def z3FormulaForEachPath(self, vc):
         global varSet
