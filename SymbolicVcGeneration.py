@@ -64,6 +64,12 @@ class SymbolicVcGeneration(PlSqlVisitor):
                     vcs = self.getSelect_statement(node, context)
                 if ruleName == "delete_statement":
                     vcs = "And("+vcs+" , "+self.getDelete_statement(node, context)+")"
+                if ruleName == "raise_statement":
+                    print("Exception Raised")
+                    break
+                if ruleName == "exception_handler":
+                    #input("wait")
+                    continue
                 if ruleName == "assume_statement":
                     vcs = "And(" + vcs + ", "+ self.getAssume_statement(node, context) +")"
                 if ruleName == "assert_statement":
