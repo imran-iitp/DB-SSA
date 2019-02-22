@@ -68,8 +68,18 @@ class SymbolicVcGeneration(PlSqlVisitor):
                     print("Exception Raised")
                     break
                 if ruleName == "exception_handler":
-                    #input("wait")
-                    continue
+                    temp_ctx = context.children[3]
+                    child_count =temp_ctx.getChildCount()
+                    for child in range(child_count):
+                        if temp_ctx.children[child].getText() == ";":
+                            continue
+                        else:
+                            child_ctx = temp_ctx.children[child]
+                            if self.helper.getRuleName(child_ctx.children[0]) == "assert_statement":
+                                #input("wait")
+                                vcs = "Implies(" + vcs + ", " + self.getAssert_statement(node, child_ctx.children[0]) + ")"
+                            else:
+                                continue
                 if ruleName == "assume_statement":
                     vcs = "And(" + vcs + ", "+ self.getAssume_statement(node, context) +")"
                 if ruleName == "assert_statement":
