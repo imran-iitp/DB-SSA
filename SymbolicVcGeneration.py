@@ -113,19 +113,42 @@ class SymbolicVcGeneration(PlSqlVisitor):
                       self.getVersionedTerminalRHS(nodeId, ctx.children[2])
         return res
 
-    def getSelect_statement(self, nodeId, ctx):
+   
+
+   def getSelect_statement(self, nodeId, ctx):
         global vcs
-       
-        vcs = "And(" + vcs + ", " + self.getInto_clause(nodeId, ctx.children[0].children[0].children[2]) + "==" + \
-              self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0].children[1]) + ")"
+        #self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0].children[1])
+
+        vcs = "And(" + vcs + ", " + self.getSelected_Element(nodeId, ctx.children[0].children[0].children[1]) + "==" + \
+              self.getInto_clause(nodeId, ctx.children[0].children[0].children[2]) + ")"
         vcs = "And(" + vcs + ", " + self.getWhereClause(nodeId, ctx.children[0].children[0].children[4]) +")"
-        
-        if self.cfg.nodes[nodeId].destructedPhi:
-            for element in self.cfg.nodes[nodeId].destructedPhi:
-                values = self.cfg.nodes[nodeId].destructedPhi[element]
-                vcs = "And(" + vcs + ", " + values[0] + "==" + values[1] + ")"
                
         return vcs
+        #input("Wait")
+    def getSelected_Element(self, nodeId, ctx):
+        temp_ctx = ctx.children[0]
+        if self.helper.getRuleName(temp_ctx) == "aggregate_windowed_function":
+            res = temp_ctx.children[0].getText()+"_"+self.getAggregate_Argument(nodeId, temp_ctx.children[1].children[1])
+            return res
+            #input("wait")
+        elif self.helper.getRuleName(temp_ctx) == "regular_id":
+            res = self.getVersionedTerminalRHS(nodeId, ctx.children[0].children[0].children[1])
+            return res
+        else:
+            return self.getSelected_Element(nodeId, temp_ctx)
+
+
+    def getAggregate_Argument(self, nodeId, ctx):
+        temp_ctx = ctx.children[0]
+        if self.helper.getRuleName(temp_ctx) == "dot_id":
+            return self.getVersionedTerminalRHS(nodeId, temp_ctx.children[0])+"_"+self.getVersionedTerminalRHS(nodeId, temp_ctx.children[2])
+        else:
+            return self.getAggregate_Argument(nodeId, temp_ctx)
+
+    def getInto_clause(self, nodeId, ctx):
+        return self.getVersionedTerminalRHS(nodeId, ctx.children[1])
+        
+
        
 
     def getInto_clause(self, nodeId, ctx):
